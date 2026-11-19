@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "hudedit",
+  "version": "${version}",
+  "name": "HudEdit",
+  "description": "Lunar-style HUD editor: move, scale and change opacity of the boss bar and chat.",
+  "authors": ["you"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.hudedit.HudEditClient"]
+  },
+  "mixins": ["hudedit.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
