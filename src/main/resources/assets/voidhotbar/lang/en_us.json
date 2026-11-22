@@ -1,0 +1,23 @@
+{
+  "key.voidhotbar.open": "Open VoidHotbar settings",
+  "key.category.voidhotbar.main": "VoidHotbar",
+  "voidhotbar.title": "VoidHotbar",
+  "voidhotbar.preset": "Preset",
+  "voidhotbar.custom": "Custom",
+  "voidhotbar.animation": "Animation",
+  "voidhotbar.anim.slide": "Slide",
+  "voidhotbar.anim.fade": "Fade",
+  "voidhotbar.anim.scale": "Scale",
+  "voidhotbar.anim.glow": "Glow",
+  "voidhotbar.anim.none": "None",
+  "voidhotbar.color.main": "Main",
+  "voidhotbar.color.active": "Active",
+  "voidhotbar.color.glow": "Glow",
+  "voidhotbar.opacity": "Opacity",
+  "voidhotbar.radius": "Corner radius",
+  "voidhotbar.size": "Size",
+  "voidhotbar.spacing": "Spacing",
+  "voidhotbar.speed": "Anim. speed",
+  "voidhotbar.reset": "Reset",
+  "voidhotbar.done": "Done"
+}

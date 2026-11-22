@@ -1,0 +1,23 @@
+{
+  "key.voidhotbar.open": "Открыть настройки VoidHotbar",
+  "key.category.voidhotbar.main": "VoidHotbar",
+  "voidhotbar.title": "VoidHotbar",
+  "voidhotbar.preset": "Пресет",
+  "voidhotbar.custom": "Свой",
+  "voidhotbar.animation": "Анимация",
+  "voidhotbar.anim.slide": "Slide",
+  "voidhotbar.anim.fade": "Fade",
+  "voidhotbar.anim.scale": "Scale",
+  "voidhotbar.anim.glow": "Glow",
+  "voidhotbar.anim.none": "Нет",
+  "voidhotbar.color.main": "Основной",
+  "voidhotbar.color.active": "Активный",
+  "voidhotbar.color.glow": "Свечение",
+  "voidhotbar.opacity": "Прозрачность",
+  "voidhotbar.radius": "Скругление",
+  "voidhotbar.size": "Размер",
+  "voidhotbar.spacing": "Расстояние",
+  "voidhotbar.speed": "Скорость",
+  "voidhotbar.reset": "Сброс",
+  "voidhotbar.done": "Готово"
+}

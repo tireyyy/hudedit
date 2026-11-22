@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "voidhotbar",
+  "version": "${version}",
+  "name": "VoidHotbar",
+  "description": "Minimalist graphite + violet hotbar with animations and a small settings menu. Client-side only.",
+  "authors": ["VoidHotbar"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.voidhotbar.VoidHotbarClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
