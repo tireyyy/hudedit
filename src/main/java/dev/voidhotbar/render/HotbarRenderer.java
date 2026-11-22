@@ -3,7 +3,6 @@ package dev.voidhotbar.render;
 import dev.voidhotbar.config.AnimationType;
 import dev.voidhotbar.config.ConfigManager;
 import dev.voidhotbar.config.VoidConfig;
-import net.minecraft.Util;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -26,14 +25,14 @@ public final class HotbarRenderer {
 
     /** Called from the HUD element that replaces VanillaHudElements.HOTBAR. */
     public void renderHud(GuiGraphics g, DeltaTracker dt, Minecraft mc, Player p) {
-        hudAnim.update(p.getInventory().getSelectedSlot(), Util.getMillis());
+        hudAnim.update(p.getInventory().getSelectedSlot(), System.currentTimeMillis());
         draw(g, g.guiWidth() / 2, g.guiHeight() - 2, mc, p, hudAnim,
                 dt.getGameTimeDeltaPartialTick(false));
     }
 
     /** Used by the settings screen: same drawing code, selection cycles on its own. */
     public void renderPreview(GuiGraphics g, int centerX, int bottomY, Minecraft mc, Player p, float partial) {
-        long now = Util.getMillis();
+        long now = System.currentTimeMillis();
         previewAnim.update((int) ((now / 1200L) % 9L), now);
         draw(g, centerX, bottomY, mc, p, previewAnim, partial);
     }
