@@ -2,7 +2,7 @@ package com.voidsky.sky;
 
 /** Built-in scenes. Body: azimuth/elevation (deg), radius (world units at sky distance 100), type, variant. */
 public enum SkyPreset {
-    BLACK_HOLE(new Body(30, 24, 30, 4, 0)),
+    BLACK_HOLE(new Body(30, 22, 26, 4, 0)),
     EARTH(new Body(35, 28, 26, 0, 0)),
     VENUS(new Body(35, 28, 26, 1, 0)),
     MARS(new Body(35, 28, 26, 2, 0)),

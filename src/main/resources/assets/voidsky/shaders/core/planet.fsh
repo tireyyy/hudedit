@@ -55,49 +55,93 @@ vec4 over(vec4 t, vec4 b) {
     return vec4(c, a);
 }
 
-vec3 discColor(float rho) {
-    float t = clamp((rho - 0.6) / 1.4, 0.0, 1.0);
-    vec3 c = mix(vec3(1.0, 0.92, 1.0), vec3(0.62, 0.25, 1.0), smoothstep(0.0, 0.4, t));
-    return mix(c, vec3(0.10, 0.32, 1.0), smoothstep(0.4, 1.0, t));
+// Blackbody-like palette for the disc: hot lavender-white -> violet -> deep blue.
+vec3 tempColor(float T) {
+    vec3 hot = vec3(1.0, 0.93, 1.0);
+    vec3 mid = vec3(0.75, 0.35, 1.0);
+    vec3 cool = vec3(0.12, 0.28, 1.0);
+    vec3 c = mix(cool, mid, smoothstep(0.15, 0.55, T));
+    return mix(c, hot, smoothstep(0.55, 1.10, T));
 }
 
-// Black hole with a lensed, rotating accretion disc. q is in units where the quad spans [-2, 2].
-vec4 blackHole(vec2 q, float ph, int oct) {
+// Physically-inspired black hole: per-pixel Schwarzschild-style ray bending (horizon r = 1),
+// thin accretion disc in the y = 0 plane (r = 3..9), Doppler beaming, turbulent differential rotation.
+// q spans [-3, 3] over the quad. Disc turbulence uses a two-layer flow-map so the looping phase never pops.
+vec4 blackHole(vec2 q, float ph, float level) {
     float R = length(q);
-    float ang = atan(q.y, q.x);
-    float horizon = 0.45;
-    float dopp = 1.0 - 0.45 * q.x / max(R, 1e-3);
+    float roll = -0.25;
+    vec2 qq = vec2(cos(roll) * q.x - sin(roll) * q.y, sin(roll) * q.x + cos(roll) * q.y);
 
-    // outer purple/blue glow
-    float glow = exp(-(R - horizon) * 2.6) * 0.35 * (1.0 - smoothstep(1.7, 2.0, R));
-    vec4 res = vec4(mix(vec3(0.5, 0.2, 1.0), vec3(0.15, 0.35, 1.0), smoothstep(0.5, 1.6, R)), R > horizon ? glow : 0.0);
+    float incl = 0.17;                                    // camera elevation above the disc plane
+    vec3 camPos = 12.0 * vec3(0.0, sin(incl), -cos(incl));
+    vec3 fwd = -normalize(camPos);
+    vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), fwd));
+    vec3 upv = cross(fwd, right);
+    vec3 vel = normalize(fwd + (qq.x * right + qq.y * upv) * 0.394);
+    vec3 pos = camPos;
 
-    // lensed image of the far side of the disc: arcs over the top and under the bottom of the hole
-    vec2 ca = vec2(cos(ang + ph * 6.0), sin(ang + ph * 6.0));
-    float lens = exp(-pow((R - 0.66) / 0.17, 2.0)) * pow(abs(q.y) / max(R, 1e-3), 0.6);
-    float lsw = 0.6 + 0.4 * fbm(vec3(ca * 2.0, R * 6.0), oct);
-    res = over(vec4(discColor(0.8 + (R - 0.5) * 2.0) * dopp, clamp(lens * lsw * 1.3, 0.0, 1.0)), res);
+    vec3 cp = cross(pos, vel);
+    float h2 = dot(cp, cp);
+    int maxSteps = 60 + int(level) * 15;
+    int oct = 3 + (level > 1.5 ? 1 : 0);
 
-    // event horizon
-    res = over(vec4(0.0, 0.0, 0.0, 1.0 - smoothstep(horizon - 0.01, horizon, R)), res);
+    float t1 = fract(ph * 0.15915494);
+    float t2 = fract(t1 + 0.5);
+    float w1 = 1.0 - abs(2.0 * t1 - 1.0);
 
-    // near side of the tilted disc, in front of the hole
-    float sinT = 0.2;
-    vec2 rq = vec2(q.x, q.y / sinT);
-    float rho = length(rq);
-    if (q.y < 0.0 || R > horizon) {
-        float a2 = atan(rq.y, rq.x) + ph * 6.0;
-        float inDisc = smoothstep(0.75, 0.85, rho) * (1.0 - smoothstep(1.85, 1.95, rho));
-        float swirl = 0.55 + 0.45 * fbm(vec3(cos(a2) * 3.0, sin(a2) * 3.0, rho * 5.0), oct);
-        float bands = 0.7 + 0.3 * sin(rho * 30.0);
-        float dA = clamp(inDisc * swirl * bands * dopp * 1.2, 0.0, 1.0);
-        res = over(vec4(discColor(rho) * (0.8 + 0.4 * dopp), dA), res);
+    vec3 col = vec3(0.0);
+    float trans = 1.0;
+    bool captured = true;
+
+    for (int i = 0; i < 105; i++) {
+        if (i >= maxSteps) break;
+        float r2 = dot(pos, pos);
+        float r = sqrt(r2);
+        if (r < 1.0) break;                               // swallowed by the horizon
+        if (r > 26.0 && dot(pos, vel) > 0.0) { captured = false; break; }
+
+        float dt = clamp(0.07 * r, 0.04, 0.9);
+        vec3 acc = -1.5 * h2 * pos / (r2 * r2 * r);
+        vec3 nvel = normalize(vel + acc * dt);
+        vec3 npos = pos + nvel * dt;
+
+        if (pos.y * npos.y < 0.0) {                       // crossed the disc plane
+            vec3 hit = mix(pos, npos, pos.y / (pos.y - npos.y));
+            float rr = length(hit.xz);
+            if (rr > 3.0 && rr < 9.0) {
+                float T = pow(3.0 / rr, 0.75);
+                vec3 vd = vec3(-hit.z, 0.0, hit.x) / rr;
+                float shift = dot(vd, -nvel) * 0.6 * sqrt(3.0 / rr);       // >0 on the approaching side
+                float beam = pow(clamp(1.0 + 1.3 * shift, 0.2, 2.5), 3.0);
+
+                float a = atan(hit.z, hit.x);
+                float spin = pow(3.0 / rr, 1.5) * 12.0 * 6.2831853;
+                float a1 = a - t1 * spin;
+                float a2 = a - t2 * spin;
+                float n1 = fbm(vec3(cos(a1) * rr * 0.8, sin(a1) * rr * 0.8, rr * 3.0), oct);
+                float n2 = fbm(vec3(cos(a2) * rr * 0.8, sin(a2) * rr * 0.8, rr * 3.0), oct);
+                float n = mix(n2, n1, w1);
+
+                float edge = smoothstep(3.0, 3.3, rr) * (1.0 - smoothstep(6.5, 9.0, rr));
+                float dens = 0.3 + 0.7 * smoothstep(0.25, 0.75, n);
+                float alpha = clamp(edge * dens * 1.15, 0.0, 1.0);
+                float inten = 0.15 + 2.2 * pow(T, 1.5);
+                col += trans * alpha * tempColor(T * (1.0 + 0.5 * shift)) * inten * beam;
+                trans *= 1.0 - alpha * 0.95;
+            }
+        }
+        pos = npos;
+        vel = nvel;
     }
 
-    // photon ring
-    float pring = exp(-pow((R - 0.47) / 0.02, 2.0));
-    res = over(vec4(vec3(1.0, 0.9, 1.0), clamp(pring * 0.9, 0.0, 1.0)), res);
-    return res;
+    vec3 c = 1.0 - exp(-col);                             // simple tone mapping, premultiplied
+    float cover = captured ? 1.0 : 1.0 - trans;
+    float a = max(cover, max(c.r, max(c.g, c.b)));
+    vec4 res = vec4(min(c / max(a, 1e-4), vec3(1.0)), a);
+
+    float halo = 0.22 * exp(-pow(R / 1.05, 2.0)) * (1.0 - smoothstep(2.0, 2.9, R));
+    vec4 haloCol = vec4(mix(vec3(0.45, 0.2, 1.0), vec3(0.12, 0.3, 1.0), smoothstep(0.3, 1.6, R)), halo);
+    return over(res, haloCol);
 }
 
 void main() {
@@ -115,7 +159,7 @@ void main() {
 
     int oct = 3 + int(qual);
     if (type > 3.5) {                // BLACK HOLE
-        vec4 bhc = blackHole(p * 2.0, ph, oct);
+        vec4 bhc = blackHole(p * 3.0, ph, qual);
         if (bhc.a <= 0.002) discard;
         fragColor = bhc;
         return;

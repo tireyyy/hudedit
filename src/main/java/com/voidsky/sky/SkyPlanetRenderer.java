@@ -98,7 +98,7 @@ public final class SkyPlanetRenderer {
             if (Math.abs(VIEW.x) > lim || Math.abs(VIEW.y) > lim) continue;
 
             float radius = b.radius() * cfg.sizeScale;
-            float half = radius / (b.type() == 3 ? 0.40f : b.type() == 4 ? 0.50f : 0.74f);
+            float half = radius / (b.type() == 3 ? 0.40f : b.type() == 4 ? 0.3333f : 0.74f);
 
             RIGHT.set(0, 1, 0).cross(DIR);
             if (RIGHT.lengthSquared() < 1e-6f) RIGHT.set(1, 0, 0);

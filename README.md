@@ -13,4 +13,4 @@ and planets (Earth, Venus, Mars, Saturn with rings, Deep Space). Menu key: **V**
 Gradle 8.14+ and JDK 21: `gradle build` → `build/libs/voidsky-0.1.0.jar`.
 
 ## Status
-Stage 2 is unverified by a compiler. If the build fails, copy the error log back to the assistant.
+Stage 3 is unverified by a compiler. If the build fails, copy the error log back to the assistant.
