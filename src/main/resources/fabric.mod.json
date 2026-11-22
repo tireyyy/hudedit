@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "voidsky",
+  "version": "${version}",
+  "name": "VoidSky",
+  "description": "Animated procedural space sky: planets, rings, atmosphere. GPU-driven, low overhead.",
+  "authors": ["VoidSky"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": ["com.voidsky.VoidSkyClient"] },
+  "mixins": ["voidsky.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": { "sodium": "*", "iris": "*" }
+}

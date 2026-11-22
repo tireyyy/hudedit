@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.voidsky.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["SkyRenderingMixin", "FogRendererMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
