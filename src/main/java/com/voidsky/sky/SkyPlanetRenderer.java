@@ -33,7 +33,7 @@ public final class SkyPlanetRenderer {
     private static final double TWO_PI = Math.PI * 2.0;
 
     private static final RenderPipeline PIPELINE = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+        RenderPipeline.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
             .withLocation(Identifier.of("voidsky", "pipeline/planet"))
             .withVertexShader(Identifier.of("voidsky", "core/planet"))
             .withFragmentShader(Identifier.of("voidsky", "core/planet"))
